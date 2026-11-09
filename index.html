@@ -136,7 +136,8 @@ nav .brand{transition:opacity .25s}
 #pjwipe{position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;opacity:0;pointer-events:none;z-index:4}
 .pjticks{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
 .pjticks span{height:2px;background:var(--line);position:relative;overflow:hidden}
-.pjticks span i{position:absolute;inset:0;background:var(--ink);transform:scaleX(0);transform-origin:left}
+.pjticks span i{position:absolute;inset:0;background:var(--ink);transform:scaleX(0);transform-origin:left;will-change:transform}
+.pjticks span i.cur{background:var(--acc)}
 @media(max-width:860px){.pjgrid{grid-template-columns:1fr;align-content:center}.pjlens{order:-1}#pjline{display:none}#projector{height:calc(100svh + 10 * 34svh)}}
 
 /* section lens wipe */
@@ -852,7 +853,7 @@ const SC=(()=>{
   // projector
   const pj=$('#projector'), pjv=[...pj.querySelectorAll('.pjlens video')], wipe=$('#pjwipe');
   $('#pjticks').innerHTML=ALL.map(()=>'<span><i></i></span>').join('');
-  let pjIdx=-1, pjBusy=null;
+  let pjIdx=-1, pjBusy=null; const pjTicks=[...document.querySelectorAll('#pjticks i')];
   const GLY='ABCDEFGHIJKLMNOPQRSTUVWXYZ#%&/<>*+=0123456789';
   function scramble(el,to){ if(reduce){el.textContent=to;return;} const from=el.textContent, n=Math.max(from.length,to.length), t0=performance.now(), D=650;
     cancelAnimationFrame(el._raf); (function f(now){ const k=(now-t0)/D; let out='';
@@ -864,7 +865,6 @@ const SC=(()=>{
     $('#pjgroup').textContent=ROBO.includes(id)?'Robotics · built with Mohannad Rababah':'Software · built with agents';
     scramble($('#pjname'),P.name); $('#pjkk').textContent=P.kk; $('#pjst').textContent=P.st;
     const ln=$('#pjline'); ln.style.opacity=0; setTimeout(()=>{ln.textContent=text(`p-${id}-0`,cur); ln.style.opacity=1;},220);
-    $$('#pjticks i').forEach((x,k)=>x.style.transform=`scaleX(${k<=i?1:0})`);
     const [b,t]=pjv;
     if(first||reduce){ b.src=film(id); b.poster=poster(id); b.addEventListener('loadedmetadata',()=>{b.currentTime=10;},{once:true}); b.play().catch(()=>{}); return; }
     t.src=film(id); t.poster=poster(id); t.addEventListener('loadedmetadata',()=>{t.currentTime=10;},{once:true}); t.play().catch(()=>{});
@@ -917,7 +917,8 @@ const SC=(()=>{
     }
     // 3. projector
     const pr=pj.getBoundingClientRect();
-    if(pr.top<vh && pr.bottom>0){ const q=clamp01(-pr.top/(pr.height-vh)); setPj(Math.min(ALL.length-1,Math.floor(q*ALL.length*0.999))); }
+    if(pr.top<vh && pr.bottom>0){ const q=clamp01(-pr.top/(pr.height-vh)); setPj(Math.min(ALL.length-1,Math.floor(q*ALL.length*0.999)));
+      const f=q*ALL.length; pjTicks.forEach((x,k)=>{ const v=Math.max(0,Math.min(1,f-k)); if(x._v!==v){ x._v=v; x.style.transform=`scaleX(${v})`; x.classList.toggle('cur',v>0&&v<1); } }); }
 
     // 5. method deck
     const hr=how.getBoundingClientRect();
