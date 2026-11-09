@@ -1,6 +1,6 @@
 # Laith Ellabadi · portfolio
 
-Live at **https://xlaithx.github.io/portfolio/**
+Live at **https://bylaith.com/**
 
 A single-page portfolio about agentic coding, AI and robotics. It's plain HTML, CSS and JavaScript with no build step. three.js comes from cdnjs and the fonts come from Google Fonts.
 
